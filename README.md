@@ -190,6 +190,8 @@ npm start                # inicia servidor produção
 npx prisma migrate dev   # cria migrations
 npx prisma studio        # abre interface do banco
 
+---
+
 ##  🧠 Boas práticas aplicadas
 Separação por camadas (Controller / Service)
 Uso de ORM (Prisma)
@@ -199,3 +201,13 @@ API REST bem definida
 Documentação com Swagger
 Código modular e organizado
 ```
+
+---
+
+## 🤝 Contribuintes
+
+Este projeto foi desenvolvido em colaboração com:
+
+- Felipe B. Franco — RM371023
+- Gabriel Sancinetti — RM372901
+- Vinícius Godoy — RM372941
