@@ -86,7 +86,7 @@ src/</br>
 
 ## ⚙️ Instalação e execução
 
-### 1. Clone o repositório
+## 1. Clone o repositório
 
 ```bash
 git clone https://github.com/viniciusgodoy88/tech-challenge-blog.git
@@ -120,13 +120,17 @@ Acesse:
 
 http://localhost:5555
 
-## ▶️ Executando o projeto
+---
+## ⚙️ Executando o projeto
+
 Modo desenvolvimento
 npm run dev
 
 Servidor rodando em:
 
 http://localhost:3000
+
+---
 
 ## 📚 Swagger (Documentação da API)
 
@@ -148,7 +152,10 @@ const swaggerDefinition = {
   ],
 };
 
+---
+
 ##  🔐 Autenticação (se aplicável no projeto)
+
 Login
 POST /auth/login
 Body
@@ -163,7 +170,10 @@ Resposta
 Uso do token
 Authorization: Bearer SEU_TOKEN
 
+---
+
 ##  📌 Rotas principais da API
+
 Posts
 Método	Rota	Descrição
 GET	/posts	Lista todos posts
@@ -172,7 +182,9 @@ POST	/posts	Cria novo post
 PUT	/posts/:id	Atualiza post
 DELETE	/posts/:id	Remove post
 
-🧪 Scripts úteis
+---
+
+## 🧪 Scripts úteis
 npm run dev              # inicia servidor com nodemon
 npm start                # inicia servidor produção
 npx prisma migrate dev   # cria migrations
