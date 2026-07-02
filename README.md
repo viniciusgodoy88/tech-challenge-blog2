@@ -56,7 +56,7 @@ Repositório: https://github.com/viniciusgodoy88/tech-challenge-blog
 
 ## 📁 Estrutura do projeto
 
-src/
+src/</br>
 ├── controllers/ </br>
 │ └── postController.js</br>
 │</br>
