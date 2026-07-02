@@ -190,7 +190,7 @@ npm start                # inicia servidor produção
 npx prisma migrate dev   # cria migrations
 npx prisma studio        # abre interface do banco
 
-🧠 Boas práticas aplicadas
+##  🧠 Boas práticas aplicadas
 Separação por camadas (Controller / Service)
 Uso de ORM (Prisma)
 Variáveis de ambiente (.env)
