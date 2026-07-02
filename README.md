@@ -120,7 +120,7 @@ Acesse:
 
 http://localhost:5555
 
-▶️ Executando o projeto
+## ▶️ Executando o projeto
 Modo desenvolvimento
 npm run dev
 
@@ -128,7 +128,7 @@ Servidor rodando em:
 
 http://localhost:3000
 
-📚 Swagger (Documentação da API)
+## 📚 Swagger (Documentação da API)
 
 A documentação interativa da API está disponível em:
 
@@ -148,7 +148,7 @@ const swaggerDefinition = {
   ],
 };
 
-🔐 Autenticação (se aplicável no projeto)
+##  🔐 Autenticação (se aplicável no projeto)
 Login
 POST /auth/login
 Body
@@ -163,7 +163,7 @@ Resposta
 Uso do token
 Authorization: Bearer SEU_TOKEN
 
-📌 Rotas principais da API
+##  📌 Rotas principais da API
 Posts
 Método	Rota	Descrição
 GET	/posts	Lista todos posts
