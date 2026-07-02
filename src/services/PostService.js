@@ -1,3 +1,5 @@
+import postRepository from "../repositories/postRepository.js";
+
 const redis = require("../config/redis");
 const postRepository = require("../repositories/postRepository");
 
@@ -14,6 +16,14 @@ class PostService {
     await redis.setEx("posts", 60, JSON.stringify(posts));
 
     return posts;
+  }
+  async searchPosts(term) {
+
+    if (!term) {
+      throw new Error("O termo de busca é obrigatório.");
+    }
+
+    return await postRepository.search(term);
   }
 }
 

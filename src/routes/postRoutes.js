@@ -1,12 +1,24 @@
-const express = require('express')
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const postController = require('../controllers/postController')
+const postController = require("../controllers/postController");
 
-router.get('/posts', postController.getPosts)
-router.get('/posts/:id', postController.getPostById)
-router.post('/posts', postController.createPost)
-router.put('/posts/:id', postController.updatePost)
-router.delete('/posts/:id', postController.deletePost)
+// Buscar todos os posts
+router.get("/posts", postController.getPosts);
 
-module.exports = router
+// Buscar posts por palavra-chave (deve vir antes de /posts/:id)
+router.get("/posts/search", postController.searchPosts);
+
+// Buscar post por ID
+router.get("/posts/:id", postController.getPostById);
+
+// Criar post
+router.post("/posts", postController.createPost);
+
+// Atualizar post
+router.put("/posts/:id", postController.updatePost);
+
+// Deletar post
+router.delete("/posts/:id", postController.deletePost);
+
+module.exports = router;
