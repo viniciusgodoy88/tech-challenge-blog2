@@ -16,22 +16,19 @@ class PostController {
     return res.status(200).json(post);
   }
 
-  async search(req, res) {
-    const posts = await PostService.search(req.query.q);
-    return res.status(200).json(posts);
-  }
-
   async update(req, res) {
-    const post = await PostService.update(
-      Number(req.params.id),
-      req.body
-    );
+    const post = await PostService.update(Number(req.params.id), req.body);
     return res.status(200).json(post);
   }
 
   async delete(req, res) {
     await PostService.delete(Number(req.params.id));
-    return res.status(200).json({ message: "deleted" });
+    return res.status(200).json({ message: "Deleted" });
+  }
+
+  async search(req, res) {
+    const posts = await PostService.search(req.query.q);
+    return res.status(200).json(posts);
   }
 }
 

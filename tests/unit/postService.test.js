@@ -1,4 +1,3 @@
-// MOCK PRIMEIRO (OBRIGATÓRIO)
 jest.mock("src/repositories/postRepository", () => ({
   create: jest.fn(),
   findAll: jest.fn(),
