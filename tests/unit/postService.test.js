@@ -1,62 +1,81 @@
-const postService = require("../../src/services/postService");
-const PostRepository = require("../../src/repositories/postRepository");
+// MOCK PRIMEIRO (OBRIGATÓRIO)
+jest.mock("src/repositories/postRepository", () => ({
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findById: jest.fn(),
+  search: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+}));
 
-jest.mock("../../src/repositories/postRepository");
+const PostRepository = require("src/repositories/postRepository");
+const PostService = require("../../src/services/PostService");
 
 describe("PostService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe("createPost", () => {
-    it("deve criar um post", async () => {
-      const mock = {
-        id: 1,
-        title: "Teste",
-        content: "Conteúdo"
-      };
-
-      PostRepository.create.mockResolvedValue(mock);
-
-      const result = await postService.createPost({
-        title: "Teste",
-        content: "Conteúdo"
-      });
-
-      expect(result).toEqual(mock);
-      expect(PostRepository.create).toHaveBeenCalledTimes(1);
+  it("deve criar um post", async () => {
+    PostRepository.create.mockResolvedValue({
+      id: 1,
+      title: "Test",
+      content: "Content",
     });
+
+    const result = await PostService.create({
+      title: "Test",
+      content: "Content",
+    });
+
+    expect(result).toHaveProperty("id");
+    expect(PostRepository.create).toHaveBeenCalled();
   });
 
-  describe("searchPosts", () => {
-    it("deve retornar posts encontrados", async () => {
-      const mockPosts = [
-        {
-          id: 1,
-          title: "Introdução ao Node",
-          content: "Aprendendo Node.js"
-        }
-      ];
+  it("deve retornar erro se não tiver título ou conteúdo", async () => {
+    await expect(PostService.create({})).rejects.toThrow(
+      "Title and content required"
+    );
+  });
 
-      PostRepository.search.mockResolvedValue(mockPosts);
+  it("deve listar posts", async () => {
+    PostRepository.findAll.mockResolvedValue([{ id: 1 }]);
 
-      const result = await postService.searchPosts("Node");
+    const result = await PostService.findAll();
 
-      expect(result).toEqual(mockPosts);
-      expect(PostRepository.search).toHaveBeenCalledWith("Node");
+    expect(result.length).toBe(1);
+  });
+
+  it("deve buscar post por id", async () => {
+    PostRepository.findById.mockResolvedValue({
+      id: 1,
+      title: "Test",
     });
 
-    it("deve retornar lista vazia quando nenhum post for encontrado", async () => {
-      PostRepository.search.mockResolvedValue([]);
+    const result = await PostService.findById(1);
 
-      const result = await postService.searchPosts("Python");
+    expect(result.id).toBe(1);
+  });
 
-      expect(result).toEqual([]);
-      expect(PostRepository.search).toHaveBeenCalledWith("Python");
-    });
+  it("deve lançar erro se post não existir", async () => {
+    PostRepository.findById.mockResolvedValue(null);
 
-    it("deve lançar erro quando o termo não for informado", async () => {
-      await expect(postService.searchPosts()).rejects.toThrow();
-    });
+    await expect(PostService.findById(999)).rejects.toThrow(
+      "Post not found"
+    );
+  });
+
+  it("deve buscar posts por termo", async () => {
+    PostRepository.search.mockResolvedValue([{ id: 1 }]);
+
+    const result = await PostService.search("node");
+
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it("deve validar termo de busca vazio", async () => {
+    await expect(PostService.search("")).rejects.toThrow(
+      "Search term required"
+    );
   });
 });

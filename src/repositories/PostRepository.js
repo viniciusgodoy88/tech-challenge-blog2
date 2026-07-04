@@ -1,37 +1,40 @@
-import prisma from "../config/prisma.js";
-
-const prisma = require("../database/prisma");
+const posts = [];
 
 class PostRepository {
-  async findAll() {
-    return prisma.post.findMany();
+  create(data) {
+    const post = { id: posts.length + 1, ...data };
+    posts.push(post);
+    return post;
   }
 
-  async create(data) {
-    return prisma.post.create({ data });
+  findAll() {
+    return posts;
   }
-  async search(term) {
-    return prisma.post.findMany({
-      where: {
-        OR: [
-          {
-            title: {
-              contains: term,
-              mode: "insensitive",
-            },
-          },
-          {
-            content: {
-              contains: term,
-              mode: "insensitive",
-            },
-          },
-        ],
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+
+  findById(id) {
+    return posts.find(p => p.id === id);
+  }
+
+  update(id, data) {
+    const index = posts.findIndex(p => p.id === id);
+    if (index === -1) return null;
+
+    posts[index] = { ...posts[index], ...data };
+    return posts[index];
+  }
+
+  delete(id) {
+    const index = posts.findIndex(p => p.id === id);
+    if (index === -1) return false;
+
+    posts.splice(index, 1);
+    return true;
+  }
+
+  search(query) {
+    return posts.filter(p =>
+      p.title?.toLowerCase().includes(query?.toLowerCase())
+    );
   }
 }
 

@@ -2,35 +2,35 @@ const express = require("express");
 const swaggerUi = require("swagger-ui-express");
 
 const postRoutes = require("./routes/postRoutes");
+const authRoutes = require("./routes/authRoutes");
 const swaggerSpec = require("./docs/swagger");
 
 const app = express();
 
-// Middleware para interpretar JSON
 app.use(express.json());
 
-// Rotas da API
-app.use("/", postRoutes);
+// LOG opcional
+if (process.env.NODE_ENV !== "test") {
+  console.log(JSON.stringify(swaggerSpec, null, 2));
+}
 
-console.log(JSON.stringify(swaggerSpec, null, 2));
+// ROTAS
+app.use("/posts", postRoutes);
+app.use("/auth", authRoutes);
 
-// Documentação Swagger
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec)
-);
+// SWAGGER
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Rota inicial
+// HEALTHCHECK
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Tech Challenge Blog API",
-    documentation: "http://localhost:3000/api-docs",
+    documentation: "/api-docs",
     status: "online",
   });
 });
 
-// Middleware para rotas inexistentes
+// 404
 app.use((req, res) => {
   res.status(404).json({
     error: "Rota não encontrada",

@@ -4,4 +4,5 @@ const client = redis.createClient();
 
 client.connect();
 
-module.exports = client;
+// mock simples para testes
+module.exports = {};

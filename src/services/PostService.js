@@ -1,29 +1,42 @@
-import postRepository from "../repositories/postRepository.js";
-
-const redis = require("../config/redis");
-const postRepository = require("../repositories/postRepository");
+const PostRepository = require("../repositories/postRepository");
 
 class PostService {
-  async getAllPosts() {
-    const cache = await redis.get("posts");
-
-    if (cache) {
-      return JSON.parse(cache);
+  async create(data) {
+    if (!data.title || !data.content) {
+      throw new Error("Title and content required");
     }
 
-    const posts = await postRepository.findAll();
-
-    await redis.setEx("posts", 60, JSON.stringify(posts));
-
-    return posts;
+    return PostRepository.create(data);
   }
-  async searchPosts(term) {
 
-    if (!term) {
-      throw new Error("O termo de busca é obrigatório.");
+  async findAll() {
+    return PostRepository.findAll();
+  }
+
+  async findById(id) {
+    if (!id) throw new Error("ID required");
+
+    const post = await PostRepository.findById(id);
+
+    if (!post) throw new Error("Post not found");
+
+    return post;
+  }
+
+  async search(term) {
+    if (!term || term.trim() === "") {
+      throw new Error("Search term required");
     }
 
-    return await postRepository.search(term);
+    return PostRepository.search(term);
+  }
+
+  async update(id, data) {
+    return PostRepository.update(id, data);
+  }
+
+  async delete(id) {
+    return PostRepository.delete(id);
   }
 }
 
