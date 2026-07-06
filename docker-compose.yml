@@ -1,22 +1,41 @@
+# Define os serviços que serão executados pelo Docker Compose.
 services:
+
+  # Serviço do banco de dados PostgreSQL.
   db:
+    # Utiliza a imagem oficial do PostgreSQL na versão 15.
     image: postgres:15
+
+    # Configura as variáveis de ambiente do banco.
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: blog
+      POSTGRES_USER: postgres         # Usuário do banco
+      POSTGRES_PASSWORD: postgres     # Senha do banco
+      POSTGRES_DB: blog               # Nome do banco de dados
+
+    # Mapeia a porta 5432 do container para a máquina local.
     ports:
       - "5432:5432"
 
+  # Serviço do Redis, utilizado como banco em memória/cache.
   redis:
+    # Utiliza a imagem oficial do Redis na versão 7.
     image: redis:7
+
+    # Mapeia a porta padrão do Redis.
     ports:
       - "6379:6379"
 
+  # Serviço da API Node.js.
   api:
+    # Constrói a imagem utilizando o Dockerfile do projeto.
     build: .
+
+    # Expõe a porta da aplicação.
     ports:
       - "3000:3000"
+
+    # Garante que o banco de dados e o Redis sejam iniciados
+    # antes da API.
     depends_on:
       - db
       - redis
