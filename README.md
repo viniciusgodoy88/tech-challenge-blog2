@@ -587,24 +587,6 @@ POST {
 
 ---
 
-➡️ **Continua na PARTE 2**, onde serão documentados:
-
-- Instalação do Git
-- Instalação do Node.js
-- Instalação do PostgreSQL
-- Instalação do Docker
-- Instalação do Postman
-- Instalação do VS Code
-- Clonagem do projeto
-- Configuração do `.env`
-- Prisma
-- Migrations
-- Seed
-- Como subir a API
-- Swagger
-
----
-
 # 💻 Pré-requisitos
 
 Antes de executar o projeto, certifique-se de que possui os seguintes softwares instalados em sua máquina.
