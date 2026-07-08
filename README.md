@@ -1734,28 +1734,6 @@ npx jest --watch
 
 ---
 
-# ✔ Checklist para Avaliação
-
-Antes de entregar o projeto, verifique:
-
-- API inicia corretamente.
-- Banco de dados criado.
-- Prisma Client gerado.
-- Migrations executadas.
-- Seed executado.
-- Swagger acessível.
-- Cadastro de usuário funcionando.
-- Login funcionando.
-- Token JWT gerado.
-- CRUD completo funcionando.
-- Busca por palavra-chave funcionando.
-- Testes passando.
-- Cobertura de testes gerada.
-
----
-
----
-
 # 🐳 Executando a Aplicação com Docker
 
 O projeto também pode ser executado utilizando Docker, garantindo que todos os avaliadores utilizem o mesmo ambiente de desenvolvimento.
