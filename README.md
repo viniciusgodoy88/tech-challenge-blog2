@@ -2271,52 +2271,6 @@ Verifique
 
 ---
 
-# Checklist Final
-
-Antes da entrega confirme:
-
-- [ ] Projeto clonado
-- [ ] Dependências instaladas
-- [ ] Banco criado
-- [ ] .env configurado
-- [ ] Prisma Generate executado
-- [ ] Migration executada
-- [ ] Seed executado
-- [ ] API iniciada
-- [ ] Swagger funcionando
-- [ ] Cadastro funcionando
-- [ ] Login funcionando
-- [ ] CRUD funcionando
-- [ ] Busca funcionando
-- [ ] Testes passando
-
----
-
-# Possíveis Melhorias Futuras
-
-- Criptografia de senha utilizando bcrypt
-- Refresh Token
-- Paginação
-- Upload de imagens
-- Upload para S3
-- Upload local
-- Cache Redis completo
-- Rate Limit
-- Logs estruturados
-- Docker Hub
-- CI/CD GitHub Actions
-- Deploy automático
-- Kubernetes
-- Testes E2E completos
-- Versionamento da API
-- Monitoramento
-- OpenTelemetry
-- Health Checks
-- Métricas Prometheus
-- Grafana
-
----
-
 # Deploy
 
 O projeto pode ser publicado em:
