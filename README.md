@@ -2361,9 +2361,9 @@ Este projeto está licenciado sob a licença **MIT**.
 
 # Autors
 
-**Vinicius Godoy - RM372941** <\br>
-**Felipe Franco - RM371023** <\br>
-**Gabriel Sancinetti - RM372901** <\br>
+**Vinicius Godoy - RM372941** <br>
+**Felipe Franco - RM371023** <br>
+**Gabriel Sancinetti - RM372901** <br>
 
 ---
 
