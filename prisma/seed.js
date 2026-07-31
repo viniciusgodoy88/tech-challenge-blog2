@@ -1,34 +1,86 @@
 const { PrismaClient } = require("@prisma/client");
 const { faker } = require("@faker-js/faker");
+const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Iniciando seed...");
+  console.log("🌱 Iniciando seed do banco de dados...");
 
-  // usuários
+  // 1. Criptografia das senhas para compatibilidade com o AuthController
+  const superAdminPassword = await bcrypt.hash("admin123", 10);
+  const teacherPassword = await bcrypt.hash("professor", 10);
+  const studentPassword = await bcrypt.hash("aluno", 10);
+  const defaultPassword = await bcrypt.hash("123456", 10);
+
+  // 2. Criar Superusuário (Tem acesso total para alterar papéis/roles)
+  const superUser = await prisma.user.upsert({
+    where: { email: "superadmin@fiap.com.br" },
+    update: {},
+    create: {
+      name: "Super Administrador",
+      email: "superadmin@fiap.com.br",
+      password: superAdminPassword,
+      role: "SUPERADMIN",
+    },
+  });
+  console.log("👤 Superusuário criado:", superUser.email);
+
+  // 3. Criar Professor Padrão (FIAP PÓS TECH)
+  const teacherUser = await prisma.user.upsert({
+    where: { email: "professorpostech@fiap.com.br" },
+    update: {},
+    create: {
+      name: "Prof. Vinicius Godoy",
+      email: "professorpostech@fiap.com.br",
+      password: teacherPassword,
+      role: "TEACHER",
+    },
+  });
+  console.log("👨‍🏫 Professor criado:", teacherUser.email);
+
+  // 4. Criar Aluno Padrão (FIAP PÓS TECH)
+  const studentUser = await prisma.user.upsert({
+    where: { email: "alunofiap@fiap.com.br" },
+    update: {},
+    create: {
+      name: "Aluno FIAP",
+      email: "alunofiap@fiap.com.br",
+      password: studentPassword,
+      role: "STUDENT",
+    },
+  });
+  console.log("👨‍🎓 Aluno criado:", studentUser.email);
+
+  // 5. Criar Usuários Aleatórios extras via Faker
   await prisma.user.createMany({
     data: Array.from({ length: 5 }).map(() => ({
-      email: faker.internet.email(),
-      password: "123456",
-      role: "user",
+      name: faker.person.fullName(),
+      email: faker.internet.email().toLowerCase(),
+      password: defaultPassword,
+      role: "STUDENT",
     })),
+    skipDuplicates: true,
   });
+  console.log("👥 Usuários dinâmicos criados com Faker");
 
-  // posts
+  // 6. Criar Posts Iniciais via Faker
   await prisma.post.createMany({
     data: Array.from({ length: 10 }).map(() => ({
       title: faker.lorem.sentence(),
-      content: faker.lorem.paragraph(),
+      content: faker.lorem.paragraphs(2),
+      authorId: teacherUser.id, // Associa os posts iniciais ao Professor
     })),
   });
+  console.log("📝 10 Posts fictícios gerados com sucesso");
 
-  console.log("✅ Seed finalizado");
+  console.log("✅ Seed finalizado com sucesso!");
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Erro ao executar o seed:", e);
+    process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();

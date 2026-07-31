@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 // Middleware responsável por verificar se a requisição
 // possui um token JWT válido.
-function authMiddleware(req, res, next) {
+function ensureAuthenticated(req, res, next) {
   // Obtém o cabeçalho Authorization da requisição.
   const authHeader = req.headers.authorization;
 
@@ -18,11 +18,11 @@ function authMiddleware(req, res, next) {
 
   try {
     // Valida o token utilizando a chave secreta definida
-    // na variável de ambiente JWT_SECRET.
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // na variável de ambiente JWT_SECRET (ou chave padrão para desenvolvimento).
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret");
 
     // Armazena os dados do usuário decodificados na requisição,
-    // permitindo seu acesso nas próximas etapas do processamento.
+    // permitindo acesso às propriedades id, email e role nas próximas etapas.
     req.user = decoded;
 
     // Continua para o próximo middleware ou controlador.
@@ -33,5 +33,22 @@ function authMiddleware(req, res, next) {
   }
 }
 
-// Exporta o middleware para ser utilizado nas rotas protegidas.
-module.exports = authMiddleware;
+// Middleware responsável por validar o perfil (role) do usuário logado.
+function checkRole(requiredRole) {
+  return (req, res, next) => {
+    // Verifica se os dados do usuário existem na requisição e se o perfil bate com o exigido
+    if (!req.user || req.user.role !== requiredRole) {
+      return res.status(403).json({ 
+        error: `Access denied. Only ${requiredRole} users can perform this action.` 
+      });
+    }
+
+    return next();
+  };
+}
+
+// Exporta os middlewares como um objeto contendo ambas as funções
+module.exports = {
+  ensureAuthenticated,
+  checkRole,
+};

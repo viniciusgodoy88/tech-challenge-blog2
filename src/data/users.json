@@ -1,0 +1,23 @@
+﻿[
+  {
+    "id": "usr_super_01",
+    "name": "Super Admin Geral",
+    "email": "superadmin@fiap.com.br",
+    "pass": "admin123",
+    "role": "SUPERADMIN"
+  },
+  {
+    "id": "usr_teacher_01",
+    "name": "Professor Pós Tech",
+    "email": "professorpostech@fiap.com.br",
+    "pass": "professor",
+    "role": "TEACHER"
+  },
+  {
+    "id": "usr_student_01",
+    "name": "Aluno FIAP",
+    "email": "alunofiap@fiap.com.br",
+    "pass": "aluno",
+    "role": "STUDENT"
+  }
+]

@@ -2,8 +2,7 @@
 const app = require("./app");
 
 // Define a porta em que o servidor será executado.
-// Utiliza a variável de ambiente PORT (caso exista),
-// ou a porta 3000 como padrão.
+// Utiliza a variável de ambiente PORT (caso exista), ou a porta 3000 como padrão.
 const PORT = process.env.PORT || 3000;
 
 /**
@@ -19,10 +18,10 @@ app.listen(PORT, () => {
   console.log("=======================================");
 
   // Mostra a URL onde a API está disponível.
-  console.log(`Servidor:      http://localhost:${PORT}`);
+  console.log(`Servidor:       http://localhost:${PORT}`);
 
   // Mostra a URL da documentação da API gerada pelo Swagger.
-  console.log(`Swagger:       http://localhost:${PORT}/api-docs`);
+  console.log(`Swagger:        http://localhost:${PORT}/api-docs`);
 
   console.log("=======================================");
 });

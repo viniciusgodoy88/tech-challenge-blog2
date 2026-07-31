@@ -1,66 +1,53 @@
-// Importa a biblioteca JWT, utilizada para gerar tokens de autenticação.
-const jwt = require("jsonwebtoken");
+// src/controllers/authController.js
 
-// Simula um banco de dados em memória para armazenar os usuários.
-// Os dados serão perdidos sempre que a aplicação for reiniciada.
-const users = [];
+const prisma = require('../database/prismaClient'); // ou seu model de banco de dados
+const bcrypt = require('bcryptjs');
 
-// Classe responsável pelas operações de autenticação.
-class AuthController {
+async function register(req, res) {
+  try {
+    const { name, email, pass, password, role } = req.body;
+    const userPassword = password || pass;
 
-  // Realiza o cadastro de um novo usuário.
-  register(req, res) {
-    const { email, password } = req.body;
-
-    // Verifica se já existe um usuário com o mesmo e-mail.
-    const exists = users.find(u => u.email === email);
-
-    if (exists) {
-      return res.status(400).json({ error: "User already exists" });
+    if (!email || !userPassword) {
+      return res.status(400).json({ error: "E-mail e senha são obrigatórios." });
     }
 
-    // Cria um novo usuário atribuindo um ID sequencial.
-    const user = {
-      id: users.length + 1,
-      email,
-      password,
-    };
+    // 1. Verifica se quem está fazendo a requisição é um SUPERUSUÁRIO / ADMIN
+    // (req.user é preenchido pelo middleware de autenticação se houver token)
+    const isSuperUser = req.user && (req.user.role === 'SUPERADMIN' || req.user.role === 'ADMIN');
 
-    // Adiciona o usuário ao armazenamento em memória.
-    users.push(user);
+    // 2. REGRA DE SEGURANÇA SUPREMA DO BACK-END:
+    // Se for Superusuário, aceita o 'role' enviado no body.
+    // Se for cadastro público ou usuário comum, FORÇA a role para 'STUDENT'.
+    const finalRole = isSuperUser && role ? role : 'STUDENT';
 
-    // Retorna o usuário criado com status HTTP 201 (Created).
-    return res.status(201).json(user);
-  }
+    // 3. Hash da senha para segurança
+    const hashedPassword = await bcrypt.hash(userPassword, 10);
 
-  // Realiza o login do usuário.
-  login(req, res) {
-    const { email, password } = req.body;
-
-    // Procura um usuário com e-mail e senha informados.
-    const user = users.find(
-      u => u.email === email && u.password === password
-    );
-
-    // Caso o usuário não seja encontrado, retorna erro de autenticação.
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    // Gera um token JWT contendo o ID e o e-mail do usuário.
-    // O token possui validade de 1 hora.
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      "secret_key",
-      { expiresIn: "1h" }
-    );
-
-    // Retorna o token de acesso para o cliente.
-    return res.status(200).json({
-      accessToken: token
+    // 4. Criação do usuário no Banco de Dados com a role validada
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: finalRole, // Garantido contra falsificação / tampering de requisição!
+      },
     });
+
+    return res.status(201).json({
+      message: "Usuário cadastrado com sucesso!",
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
+    });
+
+  } catch (error) {
+    console.error("Erro no registro:", error);
+    return res.status(500).json({ error: "Erro interno ao cadastrar usuário." });
   }
 }
 
-// Exporta uma única instância do controlador de autenticação.
-module.exports = new AuthController();
+module.exports = { register };
