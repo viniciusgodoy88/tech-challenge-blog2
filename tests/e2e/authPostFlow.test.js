@@ -12,13 +12,19 @@ describe("E2E Flow", () => {
   // Variável que armazenará o token JWT gerado após o login.
   let token;
 
+  // Geramos um e-mail dinâmico para evitar conflitos de duplicidade caso a suíte rode múltiplas vezes
+  const testEmail = `e2e_${Date.now()}@test.com`;
+  const testPassword = "123456";
+
   // Testa o cadastro de um novo usuário.
   it("deve registrar usuário", async () => {
     const res = await request(app)
       .post("/auth/register")
       .send({
-        email: "e2e@test.com",
-        password: "123456",
+        name: "Usuário Teste E2E",
+        email: testEmail,
+        password: testPassword,
+        pass: testPassword,
       });
 
     // Verifica se o cadastro foi realizado com sucesso (HTTP 201).
@@ -30,12 +36,16 @@ describe("E2E Flow", () => {
     const res = await request(app)
       .post("/auth/login")
       .send({
-        email: "e2e@test.com",
-        password: "123456",
+        email: testEmail,
+        password: testPassword,
+        pass: testPassword,
       });
 
-    // Armazena o token para ser utilizado nos próximos testes.
-    token = res.body.accessToken;
+    // Verifica se o status retornado foi 200 OK
+    expect(res.statusCode).toBe(200);
+
+    // Armazena o token para ser utilizado nos próximos testes (compatível com token e accessToken)
+    token = res.body.token || res.body.accessToken;
 
     // Verifica se o token foi gerado corretamente.
     expect(token).toBeDefined();
