@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Iniciando seed do banco de dados...");
 
-  // 1. Criptografia das senhas para compatibilidade com o AuthController
+  // 1. Criptografia das senhas para compatibilidade com a API
   const superAdminPassword = await bcrypt.hash("admin123", 10);
   const teacherPassword = await bcrypt.hash("professor", 10);
   const studentPassword = await bcrypt.hash("aluno", 10);
@@ -18,7 +18,6 @@ async function main() {
     where: { email: "superadmin@fiap.com.br" },
     update: {},
     create: {
-      name: "Super Administrador",
       email: "superadmin@fiap.com.br",
       password: superAdminPassword,
       role: "SUPERADMIN",
@@ -31,7 +30,6 @@ async function main() {
     where: { email: "professorpostech@fiap.com.br" },
     update: {},
     create: {
-      name: "Prof. Vinicius Godoy",
       email: "professorpostech@fiap.com.br",
       password: teacherPassword,
       role: "TEACHER",
@@ -44,7 +42,6 @@ async function main() {
     where: { email: "alunofiap@fiap.com.br" },
     update: {},
     create: {
-      name: "Aluno FIAP",
       email: "alunofiap@fiap.com.br",
       password: studentPassword,
       role: "STUDENT",
@@ -55,7 +52,6 @@ async function main() {
   // 5. Criar Usuários Aleatórios extras via Faker
   await prisma.user.createMany({
     data: Array.from({ length: 5 }).map(() => ({
-      name: faker.person.fullName(),
       email: faker.internet.email().toLowerCase(),
       password: defaultPassword,
       role: "STUDENT",
@@ -64,12 +60,11 @@ async function main() {
   });
   console.log("👥 Usuários dinâmicos criados com Faker");
 
-  // 6. Criar Posts Iniciais via Faker
+  // 6. Criar Posts Iniciais via Faker (Apenas title e content)
   await prisma.post.createMany({
     data: Array.from({ length: 10 }).map(() => ({
       title: faker.lorem.sentence(),
       content: faker.lorem.paragraphs(2),
-      authorId: teacherUser.id, // Associa os posts iniciais ao Professor
     })),
   });
   console.log("📝 10 Posts fictícios gerados com sucesso");
