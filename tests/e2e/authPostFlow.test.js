@@ -1,68 +1,64 @@
-// Importa a biblioteca Supertest, utilizada para realizar requisições HTTP
-// durante os testes da API.
 const request = require("supertest");
-
-// Importa a aplicação Express para que ela seja testada sem precisar
-// iniciar o servidor manualmente.
 const app = require("../../src/app");
+const prisma = require("../../src/database/prismaClient");
+const bcrypt = require("bcryptjs");
 
-// Agrupa os testes de ponta a ponta (End-to-End - E2E),
-// simulando o fluxo completo de um usuário na API.
 describe("E2E Flow", () => {
-  // Variável que armazenará o token JWT gerado após o login.
   let token;
+  const teacherEmail = `teacher_e2e_${Date.now()}@test.com`;
+  const teacherPassword = "123456";
 
-  // Geramos um e-mail dinâmico para evitar conflitos de duplicidade caso a suíte rode múltiplas vezes
-  const testEmail = `e2e_${Date.now()}@test.com`;
-  const testPassword = "123456";
+  // Prepara o usuário com permissão de TEACHER diretamente antes de testar
+  beforeAll(async () => {
+    const hashedPassword = await bcrypt.hash(teacherPassword, 10);
+    await prisma.user.create({
+      data: {
+        email: teacherEmail,
+        password: hashedPassword,
+        role: "TEACHER", // Garante permissão para criar posts
+      },
+    });
+  });
 
-  // Testa o cadastro de um novo usuário.
+  // 1. Testa o cadastro de um novo usuário Aluno via API
   it("deve registrar usuário", async () => {
     const res = await request(app)
       .post("/auth/register")
       .send({
-        name: "Usuário Teste E2E",
-        email: testEmail,
-        password: testPassword,
-        pass: testPassword,
+        email: `student_e2e_${Date.now()}@test.com`,
+        password: "123456",
+        pass: "123456",
       });
 
-    // Verifica se o cadastro foi realizado com sucesso (HTTP 201).
     expect(res.statusCode).toBe(201);
   });
 
-  // Testa o login do usuário e a geração do token de autenticação.
+  // 2. Testa o login do usuário Professor e geração do token
   it("deve logar e gerar token", async () => {
     const res = await request(app)
       .post("/auth/login")
       .send({
-        email: testEmail,
-        password: testPassword,
-        pass: testPassword,
+        email: teacherEmail,
+        password: teacherPassword,
+        pass: teacherPassword,
       });
 
-    // Verifica se o status retornado foi 200 OK
     expect(res.statusCode).toBe(200);
 
-    // Armazena o token para ser utilizado nos próximos testes (compatível com token e accessToken)
     token = res.body.token || res.body.accessToken;
-
-    // Verifica se o token foi gerado corretamente.
     expect(token).toBeDefined();
   });
 
-  // Testa a criação de um post utilizando autenticação JWT.
+  // 3. Testa a criação de post com o token do TEACHER
   it("deve criar post autenticado", async () => {
     const res = await request(app)
       .post("/posts")
-      // Envia o token no cabeçalho Authorization.
       .set("Authorization", `Bearer ${token}`)
       .send({
-        title: "Post E2E",
-        content: "Conteúdo E2E",
+        title: "Post E2E Teste",
+        content: "Conteúdo do post de testes E2E",
       });
 
-    // Verifica se o post foi criado com sucesso (HTTP 201).
     expect(res.statusCode).toBe(201);
   });
 });
