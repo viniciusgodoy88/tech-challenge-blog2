@@ -1,47 +1,53 @@
-name: Node.js CI
+name: CI/CD Pipeline - Back-End
 
 on:
   push:
-    branches: [main]
+    branches: ["main", "master"]
   pull_request:
-    branches: [main]
+    branches: ["main", "master"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
+    # 1. SOBE O CONTAINER DO POSTGRESQL PARA OS TESTES
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: blogdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      # 1. Checkout do código
-      - uses: actions/checkout@v4
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-      # 2. Setup Node.js com cache
-      - uses: actions/setup-node@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 20
+          cache: "npm"
 
-      # 3. Instala dependências de forma limpa (IMPORTANTE)
-      - name: Install dependencies
+      - name: Instalar dependências
         run: npm ci
 
-      # 4. Debug opcional (ajuda a evitar erro "prisma not found")
-      - name: Debug Prisma installation
-        run: |
-          ls -lah node_modules/.bin
-          npx prisma -v
+      # 2. RODA AS MIGRATIONS NO BANCO ANTES DE RODAR OS TESTES
+      - name: Rodar Prisma Migrations
+        env:
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/blogdb?schema=public"
+        run: npx prisma migrate dev --name init
 
-      # 5. Garantir permissão do Prisma (CORRIGE erro "Permission denied")
-      - name: Fix Prisma permissions
-        run: chmod +x node_modules/.bin/prisma
-
-      # 6. Gerar Prisma Client
-      - name: Prisma generate
-        run: npx prisma generate --schema=./prisma/schema.prisma
-
-      # 7. Testes
-      - name: Run tests
-        run: npm test --if-present
-
-      # 8. Build opcional
-      - name: Build project
-        run: npm run build --if-present
+      # 3. EXECUTA OS TESTES DO JEST
+      - name: Executar Testes com Jest
+        env:
+          DATABASE_URL: "postgresql://postgres:postgrespassword@localhost:5432/blogdb?schema=public"
+          JWT_SECRET: "test_secret_key"
+        run: npm test
