@@ -8,16 +8,50 @@ datasource db {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String?
-  email     String @unique
+  email     String    @unique
   password  String
-  role      String @default("user")
-  createdAt DateTime @default(now())
+  role      String    @default("STUDENT")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+
+  // Relacionamento com Comentários
+  comments  Comment[]
 }
 
 model Post {
-  id      Int    @id @default(autoincrement())
-  title   String
-  content String
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  summary   String?
+  author    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+
+  // Relacionamento com Comentários
+  comments  Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  author    String?
+
+  // Relacionamento com Post (Deleta comentários se o Post for excluído)
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Relacionamento opcional com User (Mantém comentário se o usuário for excluído)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // 🟢 Suporte a Respostas Aninhadas (Threads)
+  // Permite que um comentário tenha um comentário pai (parentId) e várias respostas (replies)
+  parentId  Int?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }

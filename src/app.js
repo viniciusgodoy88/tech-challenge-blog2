@@ -1,5 +1,5 @@
 const express = require("express");
-const cors = require("cors"); // 1. Importação da biblioteca cors
+const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 
 const postRoutes = require("./routes/postRoutes");
@@ -8,13 +8,13 @@ const swaggerSpec = require("./docs/swagger");
 
 const app = express();
 
-// 2. Habilita o CORS para permitir requisições de outras origens (ex: React em http://localhost:5173)
+// Habilita o CORS para permitir requisições do React
 app.use(cors());
 
-// Middleware para parsing de JSON nas requisições
+// Middleware para parsing de JSON
 app.use(express.json());
 
-// LOG opcional do Swagger Spec
+// LOG do Swagger Spec
 if (process.env.NODE_ENV !== "test") {
   console.log(JSON.stringify(swaggerSpec, null, 2));
 }
