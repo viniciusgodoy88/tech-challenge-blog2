@@ -1,22 +1,43 @@
-// src/routes/userRoutes.js (ou authRoutes.js)
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/userController');
-const { authenticateToken, authorizeRoles } = require('../middlewares/authMiddleware');
 
-// 🔒 ROTA EXCLUSIVA DO SUPERADMIN: Atualizar a role de um usuário (STUDENT <-> TEACHER)
+// Importação dos Controllers
+const authController = require('../controllers/authController');
+const userController = require('../controllers/userController');
+
+// Importação do Middleware com suporte a múltiplos nomes (aliases)
+const authMiddleware = require('../middlewares/authMiddleware');
+
+const authenticate = authMiddleware.authenticateToken || authMiddleware.ensureAuthenticated;
+const authorize = authMiddleware.authorizeRoles || authMiddleware.checkRole;
+
+// ==============================================================================
+// ROTAS PÚBLICAS DE AUTENTICAÇÃO
+// ==============================================================================
+
+// Cadastrar novo usuário (Cadastro público força perfil STUDENT)
+router.post('/register', authController.register);
+
+// Autenticar usuário e gerar token JWT
+router.post('/login', authController.login);
+
+// ==============================================================================
+// ROTAS EXCLUSIVAS DO SUPERADMIN (Gestão de Usuários)
+// ==============================================================================
+
+// 🔒 Atualizar o papel/role de um usuário (STUDENT <-> TEACHER)
 router.patch(
   '/users/:id/role',
-  authenticateToken,
-  authorizeRoles('SUPERADMIN'),
+  authenticate,
+  authorize('SUPERADMIN'),
   userController.updateUserRole
 );
 
-// 🔒 ROTA EXCLUSIVA DO SUPERADMIN: Remover um usuário do sistema
+// 🔒 Remover um usuário do sistema
 router.delete(
   '/users/:id',
-  authenticateToken,
-  authorizeRoles('SUPERADMIN'),
+  authenticate,
+  authorize('SUPERADMIN'),
   userController.deleteUser
 );
 
