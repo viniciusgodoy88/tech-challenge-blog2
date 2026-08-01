@@ -14,7 +14,12 @@ function ensureAuthenticated(req, res, next) {
   }
 
   // Extrai apenas o token, removendo o prefixo "Bearer".
-  const token = authHeader.split(" ")[1];
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.status(401).json({ error: "Invalid token format" });
+  }
+
+  const token = parts[1];
 
   try {
     // Valida o token utilizando a chave secreta definida
@@ -34,12 +39,23 @@ function ensureAuthenticated(req, res, next) {
 }
 
 // Middleware responsável por validar o perfil (role) do usuário logado.
-function checkRole(requiredRole) {
+// Aceita uma única string 'TEACHER' ou um array/múltiplos argumentos ['TEACHER', 'SUPERADMIN']
+function checkRole(...allowedRoles) {
   return (req, res, next) => {
-    // Verifica se os dados do usuário existem na requisição e se o perfil bate com o exigido
-    if (!req.user || req.user.role !== requiredRole) {
-      return res.status(403).json({ 
-        error: `Access denied. Only ${requiredRole} users can perform this action.` 
+    // Normaliza os papéis permitidos para um array simples
+    const rolesList = Array.isArray(allowedRoles[0])
+      ? allowedRoles[0]
+      : allowedRoles;
+
+    // SUPERADMIN tem permissão irrestrita a qualquer operação restrita
+    if (req.user && req.user.role === "SUPERADMIN") {
+      return next();
+    }
+
+    // Verifica se os dados do usuário existem na requisição e se o perfil bate com os permitidos
+    if (!req.user || !rolesList.includes(req.user.role)) {
+      return res.status(403).json({
+        error: `Access denied. Requires one of the following roles: ${rolesList.join(", ")}.`,
       });
     }
 
@@ -47,8 +63,11 @@ function checkRole(requiredRole) {
   };
 }
 
-// Exporta os middlewares como um objeto contendo ambas as funções
+// Exporta os middlewares originais e seus aliases para compatibilidade com a aplicação
 module.exports = {
   ensureAuthenticated,
   checkRole,
+  // Aliases para manter compatibilidade com rotas/testes que usam nomes alternativos:
+  authenticateToken: ensureAuthenticated,
+  authorizeRoles: checkRole,
 };

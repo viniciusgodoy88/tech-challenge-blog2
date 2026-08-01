@@ -1,23 +1,23 @@
-// Importa o Express, framework utilizado para criar rotas HTTP.
-const express = require("express");
-
-// Cria uma instância do Router do Express, responsável por definir
-// rotas de forma modular.
+// src/routes/userRoutes.js (ou authRoutes.js)
+const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/userController');
+const { authenticateToken, authorizeRoles } = require('../middlewares/authMiddleware');
 
-// Importa o controller de autenticação, responsável pela lógica
-// de registro e login de usuários.
-const authController = require("../controllers/authController");
+// 🔒 ROTA EXCLUSIVA DO SUPERADMIN: Atualizar a role de um usuário (STUDENT <-> TEACHER)
+router.patch(
+  '/users/:id/role',
+  authenticateToken,
+  authorizeRoles('SUPERADMIN'),
+  userController.updateUserRole
+);
 
-// Define a rota de registro de usuários.
-// Quando receber uma requisição POST em /register,
-// chama o método register do controller.
-router.post("/register", authController.register);
+// 🔒 ROTA EXCLUSIVA DO SUPERADMIN: Remover um usuário do sistema
+router.delete(
+  '/users/:id',
+  authenticateToken,
+  authorizeRoles('SUPERADMIN'),
+  userController.deleteUser
+);
 
-// Define a rota de login de usuários.
-// Quando receber uma requisição POST em /login,
-// chama o método login do controller.
-router.post("/login", authController.login);
-
-// Exporta o conjunto de rotas para ser utilizado na aplicação principal.
 module.exports = router;
