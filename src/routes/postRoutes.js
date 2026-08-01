@@ -4,8 +4,9 @@ const express = require("express");
 // Cria uma instância do Router do Express para definir rotas de forma modular.
 const router = express.Router();
 
-// Importa o controller responsável pela lógica de negócios dos posts.
+// Importa os controllers responsáveis pela lógica de negócios dos posts e comentários.
 const postController = require("../controllers/postController");
+const commentController = require("../controllers/commentController");
 
 // Importa os middlewares de autenticação e autorização por perfil (role)
 const { ensureAuthenticated, checkRole } = require("../middlewares/authMiddleware");
@@ -25,6 +26,23 @@ router.get("/", (req, res) => postController.findAll(req, res));
 // Rota para buscar um post específico pelo ID.
 // Método: GET /posts/:id
 router.get("/:id", (req, res) => postController.findById(req, res));
+
+// 💬 Rota para buscar os comentários de um post específico.
+// Método: GET /posts/:id/comments
+router.get("/:id/comments", (req, res) => commentController.getCommentsByPost(req, res));
+
+
+// ==============================================================================
+// ROTAS AUTENTICADAS (Alunos, Professores e SuperAdmin autenticados)
+// ==============================================================================
+
+// 💬 Rota para enviar um comentário em um post.
+// Método: POST /posts/:id/comments
+router.post(
+  "/:id/comments",
+  ensureAuthenticated,
+  (req, res) => commentController.createComment(req, res)
+);
 
 
 // ==============================================================================
