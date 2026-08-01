@@ -15,7 +15,7 @@ const authorize = authMiddleware.authorizeRoles || authMiddleware.checkRole;
 // ROTAS PÚBLICAS DE AUTENTICAÇÃO
 // ==============================================================================
 
-// Cadastrar novo usuário (Cadastro público força perfil STUDENT)
+// Cadastrar novo usuário público (Força perfil STUDENT por padrão)
 router.post('/register', authController.register);
 
 // Autenticar usuário e gerar token JWT
@@ -24,6 +24,22 @@ router.post('/login', authController.login);
 // ==============================================================================
 // ROTAS EXCLUSIVAS DO SUPERADMIN (Gestão de Usuários)
 // ==============================================================================
+
+// 🔒 Listar todos os usuários do sistema
+router.get(
+  '/users',
+  authenticate,
+  authorize('SUPERADMIN'),
+  userController.getAllUsers
+);
+
+// 🔒 Cadastrar novo usuário (Aluno ou Professor) com senha padrão (Ex: mudar123)
+router.post(
+  '/users',
+  authenticate,
+  authorize('SUPERADMIN'),
+  userController.createUserByAdmin
+);
 
 // 🔒 Atualizar o papel/role de um usuário (STUDENT <-> TEACHER)
 router.patch(
